@@ -4,7 +4,6 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "vercel-build": "composer install --no-dev --optimize-autoloader && vite build",
         "dev": "vite"
     },
     "devDependencies": {
