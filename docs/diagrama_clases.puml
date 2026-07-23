@@ -1,0 +1,309 @@
+@startuml
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+title Sistema de Gestión de Trabajos de Grado - Diagrama de Clases
+
+' ============================================================================
+' ENUMS
+' ============================================================================
+enum RolUsuario {
+  Administrador
+  Evaluador
+  Gestor
+}
+
+enum EstadoTrabajo {
+  subido
+  en_revision
+  retroalimentacion_emitida
+  version_corregida_subida
+  aprobado
+}
+
+enum EstadoRevision {
+  Pendiente
+  En revision
+  Finalizado
+}
+
+enum EstadoCalificacion {
+  Borrador
+  Enviada
+}
+
+enum EstadoVisualizacion {
+  Visto
+  Leido
+  No visto
+}
+
+enum TipoAlerta {
+  Recordatorio 5 dias
+  Plazo vencido
+}
+
+enum RolDirector {
+  director
+  subdirector
+}
+
+' ============================================================================
+' CLASES
+' ============================================================================
+class Usuario {
+  +id_usuario: bigint PK
+  +nombre: string
+  +apellido: string
+  +correo: string [unique]
+  +password: string
+  +rol: RolUsuario
+  +activo: boolean
+  +id_facultad: bigint FK
+  +getAuthIdentifierName(): string
+}
+
+class Facultad {
+  +id_facultad: bigint PK
+  +nombre_facultad: string
+}
+
+class Area {
+  +id_area: bigint PK
+  +nombre_area: string
+  +id_facultad: bigint FK
+}
+
+class Profesor {
+  +id_profesor: bigint PK
+  +id_usuario: bigint FK [unique]
+  +id_area: bigint FK
+}
+
+class Estudiante {
+  +id_estudiante: bigint PK
+  +nombre: string
+  +apellido: string
+  +correo: string
+  +id_trabajo: bigint FK
+  +id_area: bigint FK
+}
+
+class Gestor {
+  +id_gestor: bigint PK
+  +id_usuario: bigint FK [unique]
+}
+
+class Director {
+  +id_director: bigint PK
+  +nombre: string
+  +apellido: string
+  +correo_electronico: string [unique]
+}
+
+class TipoTrabajo {
+  +id_tipo: bigint PK
+  +nombre_tipo: string
+  +activo: boolean
+}
+
+class Trabajo {
+  +id_trabajo: bigint PK
+  +titulo: string
+  +fecha_subida: timestamp
+  +estado: EstadoTrabajo
+  +id_tipo: bigint FK
+  +archivo_pdf: string
+  +version_actual: string
+  +retirado: boolean
+}
+
+class Rubrica {
+  +id_rubrica: bigint PK
+  +id_tipo: bigint FK
+  +archivo: string
+  +mime_type: string
+  +activo: boolean
+  +fecha_creacion: timestamp
+}
+
+class Calificacion {
+  +id_calificacion: bigint PK
+  +id_rubrica: bigint FK
+  +id_profesor: bigint FK
+  +puntaje_total: integer
+  +observacion_final: text
+  +comentarios: text
+  +estado: EstadoCalificacion
+  +fecha_calificacion: timestamp
+}
+
+class Retroalimentacion {
+  +id: bigint PK
+  +trabajo_grado_id: bigint FK
+  +user_id: bigint FK
+  +comentario: text
+  +version_documento: string
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class HistorialEstado {
+  +id: bigint PK
+  +trabajo_grado_id: bigint FK
+  +estado: string
+  +version_documento: string
+  +user_id: bigint FK
+  +observacion_estado: text
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class Seguimiento {
+  +id_seguimiento: bigint PK
+  +id_trabajo: bigint FK
+  +id_admin: bigint FK
+  +estado_visualizacion: EstadoVisualizacion
+  +fecha_revision: timestamp
+}
+
+class Alerta {
+  +id_alerta: bigint PK
+  +id_trabajo_profesor: bigint FK
+  +fecha_envio: timestamp
+  +tipo_alerta: TipoAlerta
+  +leido: boolean
+}
+
+' ============================================================================
+' TABLAS PIVOT
+' ============================================================================
+class TrabajoProfesor {
+  +id_trabajo: bigint FK
+  +id_profesor: bigint FK
+  +fecha_asignacion: timestamp
+  +fecha_limite_revision: timestamp
+  +estado_revision: EstadoRevision
+  +retroalimentacion_finalizada: boolean
+  +created_at: timestamp
+  +updated_at: timestamp
+  +estaVencida: boolean (getter)
+  +diasRestantes: integer (getter)
+}
+
+class TrabajoEstudiante {
+  +id_trabajo: bigint FK
+  +id_estudiante: bigint FK
+}
+
+class TrabajoRubrica {
+  +id_trabajo_rubrica: bigint PK
+  +id_trabajo: bigint FK
+  +id_rubrica: bigint FK
+  +fecha_asignacion: timestamp
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class DirectorTrabajo {
+  +id: bigint PK
+  +id_director: bigint FK
+  +id_trabajo: bigint FK
+  +rol: RolDirector
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+' ============================================================================
+' RELACIONES
+' ============================================================================
+
+' Facultad -> Area
+Facultad "1" -- "0..*" Area : tiene
+
+' Facultad -> Usuario
+Facultad "1" -- "0..*" Usuario : pertenece
+
+' Area -> Profesor
+Area "1" -- "0..*" Profesor : tiene
+
+' Area -> Estudiante
+Area "1" -- "0..*" Estudiante : pertenece
+
+' Usuario -> Profesor (1:1)
+Usuario "1" -- "1" Profesor : es
+
+' Usuario -> Gestor (1:1)
+Usuario "1" -- "1" Gestor : es
+
+' Usuario -> Retroalimentacion
+Usuario "1" -- "0..*" Retroalimentacion : emite
+
+' Usuario -> HistorialEstado
+Usuario "1" -- "0..*" HistorialEstado : registra
+
+' TipoTrabajo -> Trabajo
+TipoTrabajo "1" -- "0..*" Trabajo : clasifica
+
+' TipoTrabajo -> Rubrica
+TipoTrabajo "1" -- "0..*" Rubrica : define
+
+' Trabajo -> Estudiante (via FK directa)
+Trabajo "1" -- "0..*" Estudiante : tiene
+
+' Trabajo -> Seguimiento
+Trabajo "1" -- "0..*" Seguimiento : supervisado
+
+' Trabajo -> Retroalimentacion
+Trabajo "1" -- "0..*" Retroalimentacion : recibe
+
+' Trabajo -> HistorialEstado
+Trabajo "1" -- "0..*" HistorialEstado : posee
+
+' Gestor -> Seguimiento
+Gestor "1" -- "0..*" Seguimiento : realiza
+
+' Profesor -> Calificacion
+Profesor "1" -- "0..*" Calificacion : otorga
+
+' Rubrica -> Calificacion
+Rubrica "1" -- "0..*" Calificacion : usada_en
+
+' TrabajoProfesor -> Alerta
+TrabajoProfesor "1" -- "0..*" Alerta : genera
+
+' ============================================================================
+' RELACIONES MANY-TO-MANY (con pivote)
+' ============================================================================
+Trabajo "1" -- "0..*" TrabajoProfesor
+Profesor "1" -- "0..*" TrabajoProfesor
+TrabajoProfesor : <<pivot>>
+
+Trabajo "1" -- "0..*" TrabajoEstudiante
+Estudiante "1" -- "0..*" TrabajoEstudiante
+TrabajoEstudiante : <<pivot>>
+
+Trabajo "1" -- "0..*" TrabajoRubrica
+Rubrica "1" -- "0..*" TrabajoRubrica
+TrabajoRubrica : <<pivot>>
+
+Trabajo "1" -- "0..*" DirectorTrabajo
+Director "1" -- "0..*" DirectorTrabajo
+DirectorTrabajo : <<pivot>>
+
+' ============================================================================
+' LEYENDA
+' ============================================================================
+legend bottom
+  **Sistema de Gesti\u00f3n de Trabajos de Grado**
+  Proyecto Laravel 12 - PostgreSQL
+  | S\u00edmbolo | Significado |
+  |---|---|
+  | 1 -- 0..* | Uno a muchos |
+  | 1 -- 1 | Uno a uno |
+  | <<pivot>> | Tabla pivote |
+endlegend
+
+@enduml

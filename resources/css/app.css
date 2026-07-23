@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --cecar-green: #07321e;
+    --cecar-lime: #c2d500;
+    --form-bg: #f4f4f4;
+    /* Project Type Badges */
+    --tag-trabajo-bg: #d1fae5;
+    /* emerald-100 approx */
+    --tag-trabajo-text: #047857;
+    /* emerald-700 approx */
+
+    --tag-emprendimiento-bg: #e0f2fe;
+    /* sky-100 approx */
+    --tag-emprendimiento-text: #0369a1;
+    /* sky-700 approx */
+
+    --tag-pasantia-bg: #fef3c7;
+    /* amber-100 approx */
+    --tag-pasantia-text: #b45309;
+    /* amber-700 approx */
+
+    --tag-default-bg: #f3f4f6;
+    /* gray-100 approx */
+    --tag-default-text: #4b5563;
+    /* gray-600 approx */
+}
+
+/* Utility Classes for homogeneous design */
+.tag-trabajo {
+    background-color: var(--tag-trabajo-bg);
+    color: var(--tag-trabajo-text);
+}
+
+.tag-emprendimiento {
+    background-color: var(--tag-emprendimiento-bg);
+    color: var(--tag-emprendimiento-text);
+}
+
+.tag-pasantia {
+    background-color: var(--tag-pasantia-bg);
+    color: var(--tag-pasantia-text);
+}
+
+.tag-default {
+    background-color: var(--tag-default-bg);
+    color: var(--tag-default-text);
+}
+
+.Form {
+    background-color: var(--form-bg);
+    padding-top: 32px;
+    padding-bottom: 32px;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.input-custom {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    width: 100%;
+}
+
+.table-header {
+    background-color: #07321e;
+    color: #ffffff;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
+}
+
+/* Redesigned Premium Sidebar Styles */
+.sidebar-gradient {
+    background: linear-gradient(185deg, #03180d 0%, #07321e 50%, #0c4a2d 100%);
+}
+
+.sidebar-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-item:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+    transform: translateX(4px);
+}
+
+.sidebar-item-active {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-weight: 600;
+
+}
+
+
+.sidebar-section-title {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 1rem 0.5rem 0.5rem 0.5rem;
+}
+
+/* Tooltip styles for collapsed sidebar */
+.sidebar-tooltip {
+    position: absolute;
+    left: 100%;
+    margin-left: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background-color: #03180d;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-10px);
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+.sidebar-item:hover .sidebar-tooltip {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Performance: Deferred Rendering
+   Apply to sections OUTSIDE the initial viewport to skip off-screen rendering.
+   MANDATORY: paired with contain-intrinsic-size to prevent layout shift.
+   DO NOT apply to above-the-fold content.
+   Ref: Modern Web Guidance — defer-rendering-heavy-content
+   ──────────────────────────────────────────────────────────────────────────── */
+.deferred-section {
+    content-visibility: auto;
+    /* auto keyword lets the browser remember the real size after first render */
+    contain-intrinsic-size: auto none auto 600px;
+}
+
+/* Fallback for browsers without content-visibility support (Baseline Newly Available Sep 2025) */
+@supports not (content-visibility: auto) {
+    .deferred-section {
+        contain: layout style paint;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Performance: Font Display
+   Ensure Poppins doesn't block text rendering (prevents FOIT).
+   ──────────────────────────────────────────────────────────────────────────── */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: local('Poppins');
+}
