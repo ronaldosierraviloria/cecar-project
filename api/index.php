@@ -1,5 +1,7 @@
 <?php
 
+define('LARAVEL_START', microtime(true));
+
 // 1. Prepare writable directories in /tmp for Vercel Serverless environment
 $storagePath = '/tmp/storage';
 $dirs = [
@@ -30,12 +32,12 @@ try {
     }
     require $autoloadPath;
 
+    /** @var \Illuminate\Foundation\Application $app */
     $app = require_once __DIR__ . '/../bootstrap/app.php';
     $app->useStoragePath($storagePath);
 
-    $request = Illuminate\Http\Request::capture();
-    $response = $app->handleRequest($request);
-    $response->send();
+    // In Laravel 12, handleRequest() captures the request and sends the response directly
+    $app->handleRequest(\Illuminate\Http\Request::capture());
 } catch (\Throwable $e) {
     if (!headers_sent()) {
         http_response_code(500);
