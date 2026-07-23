@@ -26,7 +26,7 @@ putenv('VIEW_COMPILED_PATH=' . $storagePath . '/framework/views');
 try {
     $autoloadPath = __DIR__ . '/../vendor/autoload.php';
     if (!file_exists($autoloadPath)) {
-        throw new \Exception("El archivo vendor/autoload.php no existe. Asegúrate de ejecutar composer install en el build.");
+        throw new \Exception("El archivo vendor/autoload.php no existe.");
     }
     require $autoloadPath;
 
@@ -37,7 +37,9 @@ try {
     $response = $app->handleRequest($request);
     $response->send();
 } catch (\Throwable $e) {
-    http_response_code(500);
+    if (!headers_sent()) {
+        http_response_code(500);
+    }
     echo "<h1>Error en Laravel (Vercel)</h1>";
     echo "<p><strong>Mensaje:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
     echo "<p><strong>Archivo:</strong> " . htmlspecialchars($e->getFile()) . ":" . $e->getLine() . "</p>";
