@@ -24,14 +24,15 @@ putenv('APP_ROUTES_CACHE=' . '/tmp/bootstrap/cache/routes.php');
 putenv('VIEW_COMPILED_PATH=' . $storagePath . '/framework/views');
 
 try {
-    // 3. Require the Composer autoloader
-    require __DIR__ . '/../vendor/autoload.php';
+    $autoloadPath = __DIR__ . '/../vendor/autoload.php';
+    if (!file_exists($autoloadPath)) {
+        throw new \Exception("El archivo vendor/autoload.php no existe. Asegúrate de ejecutar composer install en el build.");
+    }
+    require $autoloadPath;
 
-    // 4. Boot Laravel application and bind storage path to /tmp
     $app = require_once __DIR__ . '/../bootstrap/app.php';
     $app->useStoragePath($storagePath);
 
-    // 5. Handle HTTP request
     $request = Illuminate\Http\Request::capture();
     $response = $app->handleRequest($request);
     $response->send();
