@@ -4,8 +4,60 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "45a01833b0d6623d61364a72794e3196",
+    "content-hash": "98a27296816c5979135e8db79cdb8760",
     "packages": [
+        {
+            "name": "alies-dev/laravel-supabase-flysystem",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/alies-dev/laravel-supabase-flysystem.git",
+                "reference": "3223a6ed4f94910fd8bfcbf3acee0c32f693aff8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/alies-dev/laravel-supabase-flysystem/zipball/3223a6ed4f94910fd8bfcbf3acee0c32f693aff8",
+                "reference": "3223a6ed4f94910fd8bfcbf3acee0c32f693aff8",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "^11.35 || ^12.0",
+                "illuminate/support": "^11.35 || ^12.0",
+                "league/flysystem": "^3.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.71",
+                "orchestra/testbench": "^9.0 || ^10.0",
+                "phpunit/phpunit": "^11.5 || ^12.0",
+                "psalm/plugin-phpunit": "^0.19.2",
+                "rector/rector": "^2.0",
+                "vimeo/psalm": "^6.8"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "AliesDev\\LaravelSupabaseFlysystem\\SupabaseStorageServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AliesDev\\LaravelSupabaseFlysystem\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Laravel Flysystem adapter for Supabase Storage",
+            "support": {
+                "issues": "https://github.com/alies-dev/laravel-supabase-flysystem/issues",
+                "source": "https://github.com/alies-dev/laravel-supabase-flysystem/tree/1.0.1"
+            },
+            "time": "2025-12-03T19:41:15+00:00"
+        },
         {
             "name": "archtechx/enums",
             "version": "v1.1.2",

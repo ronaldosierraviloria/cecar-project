@@ -48,13 +48,10 @@ return [
         ],
 
         'supabase' => [
-            'driver' => 's3',
+            'driver' => 'supabase',
             'key' => env('SUPABASE_KEY'),
-            'secret' => env('SUPABASE_KEY'),
-            'region' => 'us-east-1',
             'bucket' => env('SUPABASE_BUCKET'),
-            'endpoint' => env('SUPABASE_URL') . '/storage/v1/s3',
-            'use_path_style_endpoint' => true,
+            'endpoint' => env('SUPABASE_URL'),
             'throw' => false,
             'report' => false,
         ],
