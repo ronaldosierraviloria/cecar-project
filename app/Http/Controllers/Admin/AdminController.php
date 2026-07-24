@@ -594,8 +594,8 @@ class AdminController extends Controller
 
             // Delete PDF file
             $relative = preg_replace('#^storage/#', '', $trabajo->archivo_pdf);
-            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($relative)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($relative);
+            if (\Illuminate\Support\Facades\Storage::disk('supabase')->exists($relative)) {
+                \Illuminate\Support\Facades\Storage::disk('supabase')->delete($relative);
             }
 
             // Finally, delete the project

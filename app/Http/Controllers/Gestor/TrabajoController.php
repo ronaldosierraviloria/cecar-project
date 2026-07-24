@@ -43,28 +43,19 @@ class TrabajoController extends Controller
     {
         $trabajo = \App\Models\Trabajo::findOrFail($id);
 
-        // Convertir la ruta 'storage/pdf/...' a ruta relativa dentro del disco 'public'
         $relative = preg_replace('#^storage/#', '', $trabajo->archivo_pdf);
 
-        if (!Storage::disk('public')->exists($relative)) {
+        if (!Storage::disk('supabase')->exists($relative)) {
             abort(404);
         }
 
-        $path = Storage::disk('public')->path($relative);
+        $url = Storage::disk('supabase')->temporaryUrl($relative, now()->addMinutes(10));
 
         if (request()->has('download')) {
-            return response()->download($path, basename($trabajo->archivo_pdf), [
-                'Content-Type' => 'application/pdf',
-            ]);
+            return redirect($url);
         }
 
-        return response()->file($path, [
-            'Content-Type' => 'application/pdf',
-            'X-Frame-Options' => 'SAMEORIGIN',
-            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-            'Pragma' => 'no-cache',
-            'Expires' => '0',
-        ]);
+        return redirect($url);
     }
 
     // Guardar el trabajo en la base de datos
@@ -110,12 +101,12 @@ class TrabajoController extends Controller
 
         // Si ya existe un archivo con ese nombre, agregarle un sufijo
         $contador = 1;
-        while (Storage::disk('public')->exists("pdf/{$nombreArchivo}")) {
+        while (Storage::disk('supabase')->exists("pdf/{$nombreArchivo}")) {
             $nombreArchivo = "{$nombreLimpio}-{$contador}.{$extension}";
             $contador++;
         }
 
-        $rutaArchivo = $archivo->storeAs('pdf', $nombreArchivo, 'public');
+        $rutaArchivo = $archivo->storeAs('pdf', $nombreArchivo, 'supabase');
 
         // Guardar todo en una transacción: trabajo, historial, estudiantes, rúbrica y pivote
         DB::beginTransaction();
@@ -191,8 +182,8 @@ class TrabajoController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             // Limpiar archivo subido si existiera
-            if (isset($rutaArchivo) && Storage::disk('public')->exists($rutaArchivo)) {
-                Storage::disk('public')->delete($rutaArchivo);
+            if (isset($rutaArchivo) && Storage::disk('supabase')->exists($rutaArchivo)) {
+                Storage::disk('supabase')->delete($rutaArchivo);
             }
 
             return redirect()->back()->with('error', 'Ocurrió un error al guardar el trabajo: ' . $e->getMessage());
@@ -223,8 +214,8 @@ class TrabajoController extends Controller
 
         // Eliminar archivo anterior
         $relative = preg_replace('#^storage/#', '', $trabajo->archivo_pdf);
-        if (Storage::disk('public')->exists($relative)) {
-            Storage::disk('public')->delete($relative);
+        if (Storage::disk('supabase')->exists($relative)) {
+            Storage::disk('supabase')->delete($relative);
         }
 
         // Guardar el nuevo archivo
@@ -234,12 +225,12 @@ class TrabajoController extends Controller
         $nombreArchivo = $nombreLimpio . '.' . $extension;
 
         $contador = 1;
-        while (Storage::disk('public')->exists("pdf/{$nombreArchivo}")) {
+        while (Storage::disk('supabase')->exists("pdf/{$nombreArchivo}")) {
             $nombreArchivo = "{$nombreLimpio}-{$contador}.{$extension}";
             $contador++;
         }
 
-        $rutaArchivo = $archivo->storeAs('pdf', $nombreArchivo, 'public');
+        $rutaArchivo = $archivo->storeAs('pdf', $nombreArchivo, 'supabase');
         $trabajo->update(['archivo_pdf' => 'storage/' . $rutaArchivo]);
 
         // Borrar retroalimentaciones anteriores al reemplazar el documento
@@ -278,12 +269,12 @@ class TrabajoController extends Controller
 
         // Evitar colisión de nombres
         $contador = 1;
-        while (Storage::disk('public')->exists("pdf/{$nombreArchivo}")) {
+        while (Storage::disk('supabase')->exists("pdf/{$nombreArchivo}")) {
             $nombreArchivo = "{$nombreLimpio}-{$nuevaVersion}-{$contador}.{$extension}";
             $contador++;
         }
 
-        $rutaArchivo = $archivo->storeAs('pdf', $nombreArchivo, 'public');
+        $rutaArchivo = $archivo->storeAs('pdf', $nombreArchivo, 'supabase');
 
         // Actualizar el modelo del trabajo con el nuevo archivo y la nueva versión
         $trabajo->update([
@@ -374,8 +365,8 @@ class TrabajoController extends Controller
 
             // Delete PDF file
             $relative = preg_replace('#^storage/#', '', $trabajo->archivo_pdf);
-            if (Storage::disk('public')->exists($relative)) {
-                Storage::disk('public')->delete($relative);
+            if (Storage::disk('supabase')->exists($relative)) {
+                Storage::disk('supabase')->delete($relative);
             }
 
             // Finally, delete the project
@@ -485,7 +476,7 @@ class TrabajoController extends Controller
             $extension = $archivo->getClientOriginalExtension();
             $nombreArchivo = time() . '_' . $nombreLimpio . '.' . $extension;
 
-            $rutaArchivo = $archivo->storeAs('pdf', $nombreArchivo, 'public');
+            $rutaArchivo = $archivo->storeAs('pdf', $nombreArchivo, 'supabase');
 
             // Convertir propuesta a trabajo de grado
             $trabajo->update([
@@ -538,8 +529,8 @@ class TrabajoController extends Controller
                 ->with('success', 'Informe final subido correctamente. El trabajo ahora es un Trabajo de Grado y se ha reasignado a los evaluadores.');
         } catch (\Exception $e) {
             DB::rollBack();
-            if (isset($rutaArchivo) && Storage::disk('public')->exists($rutaArchivo)) {
-                Storage::disk('public')->delete($rutaArchivo);
+            if (isset($rutaArchivo) && Storage::disk('supabase')->exists($rutaArchivo)) {
+                Storage::disk('supabase')->delete($rutaArchivo);
             }
             return redirect()->back()->with('error', 'Error al subir el informe final: ' . $e->getMessage());
         }

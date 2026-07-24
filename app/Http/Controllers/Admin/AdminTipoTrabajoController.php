@@ -107,7 +107,7 @@ class AdminTipoTrabajoController extends Controller
             // Eliminar rúbricas asociadas
             foreach ($tipo->rubrica as $rubrica) {
                 if ($rubrica->archivo) {
-                    Storage::disk('public')->delete($rubrica->archivo);
+                    Storage::disk('supabase')->delete($rubrica->archivo);
                 }
                 $rubrica->delete();
             }

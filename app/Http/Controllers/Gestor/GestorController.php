@@ -70,8 +70,8 @@ class GestorController extends Controller
         
         // Eliminar archivo PDF
         $relative = preg_replace('#^storage/#', '', $trabajo->archivo_pdf);
-        if (Storage::disk('public')->exists($relative)) {
-            Storage::disk('public')->delete($relative);
+        if (Storage::disk('supabase')->exists($relative)) {
+            Storage::disk('supabase')->delete($relative);
         }
 
         // Eliminar estudiantes
